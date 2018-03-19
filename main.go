@@ -4,16 +4,19 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/gorilla/mux"
 	"github.com/gorilla/handlers"
-	_ "github.com/mattn/go-sqlite3"
+	"github.com/gorilla/mux"
+	"github.com/michaeljs1990/sqlitestore"
+
 	"database/sql"
 	"github.com/labstack/gommon/log"
+	_ "github.com/mattn/go-sqlite3"
 	"os/signal"
 	"syscall"
 )
 
 var db *sql.DB
+var sessionStore *sqlitestore.SqliteStore
 
 func initDB() {
 	var err error
@@ -25,6 +28,10 @@ func initDB() {
 	create table if not exists auth(id integer primary key autoincrement, username text, password text)
 	`
 	_, err = db.Exec(initSql)
+	if err != nil {
+		log.Info(err)
+	}
+	sessionStore, err = sqlitestore.NewSqliteStore("./auth.sqlite", "sessions", "/", 3600, []byte("lohM2oofaef7eyoophahcohngaihe4ah"))
 	if err != nil {
 		log.Info(err)
 	}
@@ -45,8 +52,9 @@ func main() {
 	router := mux.NewRouter()
 	initDB()
 	router.Handle("/", http.FileServer(http.Dir("./html/")))
-	router.Handle("/signin", SigninHandler).Methods("POST")
-	router.Handle("/signup", SignupHandler).Methods("POST")
+	router.Handle("/signin", SignInHandler).Methods("POST")
+	router.Handle("/signup", SignUpHandler).Methods("POST")
+	router.Handle("/logout", LogoutHandler).Methods("POST")
 
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
 	http.ListenAndServe(":8081", handlers.LoggingHandler(os.Stdout, router))

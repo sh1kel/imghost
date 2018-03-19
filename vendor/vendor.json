@@ -3,14 +3,56 @@
 	"ignore": "test",
 	"package": [
 		{
+			"checksumSHA1": "g/V4qrXjUGG9B+e3hB+4NAYJ5Gs=",
+			"path": "github.com/gorilla/context",
+			"revision": "08b5f424b9271eedf6f9f0ce86cb9396ed337a42",
+			"revisionTime": "2016-08-17T18:46:32Z"
+		},
+		{
+			"checksumSHA1": "t1nayUUugNoJWht7p4cbKyWuk8Q=",
+			"path": "github.com/gorilla/handlers",
+			"revision": "90663712d74cb411cbef281bc1e08c19d1a76145",
+			"revisionTime": "2017-11-01T17:43:35Z"
+		},
+		{
 			"checksumSHA1": "KGBsAyAxS+hp4NHh1kbI6nIVDbI=",
 			"path": "github.com/gorilla/mux",
 			"revision": "4dbd923b0c9e99ff63ad54b0e9705ff92d3cdb06",
 			"revisionTime": "2018-03-14T16:31:26Z"
 		},
 		{
+			"checksumSHA1": "ucTBCc7dDRKLGPsYfAzu/Gq63qA=",
+			"path": "github.com/gorilla/securecookie",
+			"revision": "e59506cc896acb7f7bf732d4fdf5e25f7ccd8983",
+			"revisionTime": "2017-02-24T19:38:04Z"
+		},
+		{
+			"checksumSHA1": "hvvZPckMAA1bO17He4lVJEC7k+8=",
+			"path": "github.com/gorilla/sessions",
+			"revision": "7910f5bb5ac86ab08f97d8bda39b476fc117b684",
+			"revisionTime": "2018-03-12T18:45:12Z"
+		},
+		{
 			"path": "github.com/imghost",
 			"revision": ""
+		},
+		{
+			"checksumSHA1": "96sUfNvv3aAc6tgF6mcmO+0fBbE=",
+			"path": "github.com/labstack/gommon/log",
+			"revision": "6fe1405d73ec4bd4cd8a4ac8e2a2b2bf95d03954",
+			"revisionTime": "2018-03-12T17:41:16Z"
+		},
+		{
+			"checksumSHA1": "kkrB7pmaYpiLEXemXczHF6BWD44=",
+			"path": "github.com/mattn/go-sqlite3",
+			"revision": "9101028e5ca824d2baf0fbd91b9700e2669a6cd9",
+			"revisionTime": "2018-03-07T07:20:36Z"
+		},
+		{
+			"checksumSHA1": "CwfQw+YI8n6l9UnCk3uL3AmUP7Y=",
+			"path": "github.com/michaeljs1990/sqlitestore",
+			"revision": "37b8425f7b437b5f20e0a0f50b3fe1a3f069c5bc",
+			"revisionTime": "2017-10-09T14:02:04Z"
 		}
 	],
 	"rootPath": "github.com/imghost"
