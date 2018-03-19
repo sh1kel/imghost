@@ -16,4 +16,5 @@
 !/vendor/vendor.json
 
 # Database
-auth.db
+auth.sqlite
+imghost
