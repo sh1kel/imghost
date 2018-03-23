@@ -59,12 +59,13 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 
 	session.Options.MaxAge = 3600
 	session.Values["authenticated"] = true
+	session.Values["username"] = creds.Username
+
 	err = session.Save(r, w)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	w.Write([]byte("Authenticated"))
 }
 
 func SignUp(w http.ResponseWriter, r *http.Request) {
@@ -123,6 +124,7 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	w.Write([]byte("Logged out"))
+	//w.Write([]byte("Logged out"))
+	http.Redirect(w, r, "http://localhost:8081", 307)
 
 }
