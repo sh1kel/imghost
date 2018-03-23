@@ -20,7 +20,7 @@ var NotFoundHandler = http.HandlerFunc(NotFoundRoute)
 
 
 func RootRoute(w http.ResponseWriter, r *http.Request) {
-	var user = User{Name: "Preved"}
+	var user = User{Name: "Anonym"}
 	session, err := sessionStore.Get(r, "imghost-cookie")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -28,12 +28,10 @@ func RootRoute(w http.ResponseWriter, r *http.Request) {
 	if session.Values["authenticated"] != true {
 		http.Redirect(w, r, "http://localhost:8081/auth", 307)
 	}
-	//w.Write([]byte("This is /"))
-	user.Name = session.Values["username"].(string)
-	//tmpl := template.New("index")
-	//template.Must(tmpl.ParseFiles("templates/index.html"))
+	if session.Values["username"] != nil {
+		user.Name = session.Values["username"].(string)
+	}
 	indexTemplate, err := template.ParseFiles("templates/index.html")
-	//template.Must(tmpl.Parse("Hello, {{.Name}}"))
 
 	err = indexTemplate.Execute(w, user)
 	if err != nil {

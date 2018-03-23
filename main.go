@@ -51,7 +51,6 @@ func main() {
 
 	router := mux.NewRouter()
 	initDB()
-	//router.Handle("/auth.html", http.FileServer(http.Dir("./html/")))
 	router.Handle("/auth", AuthHandler).Methods("GET")
 	router.Handle("/signin", SignInHandler).Methods("POST")
 	router.Handle("/signup", SignUpHandler).Methods("POST")
@@ -60,6 +59,6 @@ func main() {
 	router.NotFoundHandler = http.HandlerFunc(NotFoundHandler)
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
 
-	http.ListenAndServe(":8081", handlers.LoggingHandler(os.Stdout, router))
+	http.ListenAndServe("127.0.0.1:8081", handlers.LoggingHandler(os.Stdout, router))
 
 }

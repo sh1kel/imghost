@@ -36,8 +36,8 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 	err = result.Scan(&storedCreds.Password)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			w.Write([]byte("Auth failed"))
 			w.WriteHeader(http.StatusUnauthorized)
+			w.Write([]byte("<html></html>"))
 			return
 		}
 		w.WriteHeader(http.StatusInternalServerError)
@@ -46,8 +46,8 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 
 	err = bcrypt.CompareHashAndPassword([]byte(storedCreds.Password), []byte(creds.Password))
 	if err != nil {
-		w.Write([]byte("Auth failed"))
 		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte("<html></html>"))
 		return
 	}
 
@@ -66,6 +66,7 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	w.Write([]byte("<html></html>"))
 }
 
 func SignUp(w http.ResponseWriter, r *http.Request) {

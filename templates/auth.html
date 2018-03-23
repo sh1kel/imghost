@@ -6,38 +6,58 @@
 	<link rel="stylesheet" href="static/css/reset.css">
 	<link rel="stylesheet" href="static/css/animate.css">
 	<link rel="stylesheet" href="static/css/styles.css">
-	<link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="static/css/alert.css">
+
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
 	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
 </head>
 <body>
 
-	<div id="container">
-		<form name="auth-form" onSubmit="return login()">
-			<label for="name">Логин:</label>
-			<input id="username" type="name">
-			<label for="username">Пароль:</label>
+    <div id="container">
+        <form name="auth-form" onSubmit="return login()">
+            <label for="name">Логин:</label>
+            <input id="username" type="name">
+            <label for="username">Пароль:</label>
             <!-- <p><a href="#">Забыли пароль?</a></p> -->
-			<input id="password" type="password">
-			<div id="lower">
+            <input id="password" type="password">
+            <div id="lower">
                 <!-- <input type="checkbox"><label class="check" for="checkbox">Запомнить меня</label> -->
-                <input type="checkbox"><label class="check" for="checkbox">Запомнить меня</label> 
-				<input type="submit" value="Войти" onClick="return login()">
-			</div>
-		</form>
-	</div>
+                <input type="checkbox"><label class="check" for="checkbox">Запомнить меня</label>
+                <input type="submit" value="Войти" onClick="return login()">
+            </div>
+        </form>
+    </div>
     <script>
-		function login() {
-			const params = {
-			    username: document.getElementById('username').value,
-			    password: document.getElementById('password').value
-			}
+        function redirect(url) {
+            document.body.innerHTML = '';
 
-			const http = new XMLHttpRequest()
-			http.open('POST', '/signin', false)
-			http.setRequestHeader('Content-type', 'application/json')
-			http.send(JSON.stringify(params))
-            window.location.replace("http://localhost:8081")
+            window.location.replace(url);
+        }
+
+		function login() {
+            const  params = {
+                    username: document.getElementById('username').value,
+                    password: document.getElementById('password').value
+                };
+            var auth = false;
+            const request = new XMLHttpRequest();
+            request.open('POST', '/signin', false);
+            request.setRequestHeader('Content-type', 'application/json');
+            request.send(JSON.stringify(params));
+            if (request.status == 200) {
+                auth = true
+            }
+
+            document.body.innerHTML = '';
+            if (auth == true) {
+                setTimeout(redirect("/"), 1000);
+            } else {
+                alert("Auth failed!");
+                setTimeout(redirect("/auth"), 2000);
+            }
 		}
+
     </script>
+
 </body>
 </html>
