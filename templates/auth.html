@@ -12,7 +12,7 @@
 <body>
 
 	<div id="container">
-		<form name="auth-form">
+		<form name="auth-form" onSubmit="return login()">
 			<label for="name">Логин:</label>
 			<input id="username" type="name">
 			<label for="username">Пароль:</label>
@@ -21,7 +21,7 @@
 			<div id="lower">
                 <!-- <input type="checkbox"><label class="check" for="checkbox">Запомнить меня</label> -->
                 <input type="checkbox"><label class="check" for="checkbox">Запомнить меня</label> 
-				<input type="button" value="Войти" onclick="return login()">
+				<input type="submit" value="Войти" onClick="return login()">
 			</div>
 		</form>
 	</div>

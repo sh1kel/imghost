@@ -3,8 +3,12 @@ package main
 import (
 	"net/http"
 	"html/template"
-	"log"
 )
+
+type User struct {
+	Name	string
+
+}
 
 var DumbHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Dumb"))
@@ -16,19 +20,27 @@ var NotFoundHandler = http.HandlerFunc(NotFoundRoute)
 
 
 func RootRoute(w http.ResponseWriter, r *http.Request) {
+	var user = User{Name: "Preved"}
 	session, err := sessionStore.Get(r, "imghost-cookie")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
 	}
-	log.Printf("Auth: %v", session.Values["authenticated"])
 	if session.Values["authenticated"] != true {
 		http.Redirect(w, r, "http://localhost:8081/auth", 307)
 	}
-	w.Write([]byte("This is /"))
-	//UserName := session.Values["username"]
-	//tmpl := template.Must(template.ParseFiles("templates/index.html"))
-	//tmpl.Execute(w, UserName)
+	//w.Write([]byte("This is /"))
+	user.Name = session.Values["username"].(string)
+	//tmpl := template.New("index")
+	//template.Must(tmpl.ParseFiles("templates/index.html"))
+	indexTemplate, err := template.ParseFiles("templates/index.html")
+	//template.Must(tmpl.Parse("Hello, {{.Name}}"))
+
+	err = indexTemplate.Execute(w, user)
+	if err != nil {
+		w.Write([]byte(err.Error()))
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 
 
 }
