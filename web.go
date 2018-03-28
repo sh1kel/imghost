@@ -6,8 +6,10 @@ import (
 	"fmt"
 	"mime/multipart"
 	"io/ioutil"
-	"github.com/kennygrant/sanitize"
 	"github.com/labstack/gommon/log"
+	"encoding/json"
+	"github.com/rainycape/unidecode"
+	"path"
 )
 
 type User struct {
@@ -60,6 +62,11 @@ func NotFoundRoute(w http.ResponseWriter, r *http.Request) {
 }
 
 func DownloadData(w http.ResponseWriter, r *http.Request) {
+	var fName string
+	type jsonResponse struct {
+		FileUrl	string	`json:"FileUrl"`
+		Status	string	`json:"Status"`
+	}
 	session, err := sessionStore.Get(r, "imghost-cookie")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -72,32 +79,48 @@ func DownloadData(w http.ResponseWriter, r *http.Request) {
 	}
 	file, handle, err := r.FormFile("file")
 	if err != nil {
-		fmt.Fprintf(w, "%v", err)
+		fmt.Fprintf(w, "{\"Error\":\"%v\"}", err)
 		return
 	}
-	fmt.Fprintf(w, "File: %s\n", handle.Header)
 	defer file.Close()
 	mimeType := handle.Header.Get("Content-Type")
 	switch mimeType {
 	case "image/jpeg":
-		saveFile(w, file, handle)
+		fName, err = saveFile(w, file, handle)
 	case "image/png":
-		saveFile(w, file, handle)
-
+		fName, err = saveFile(w, file, handle)
+	default:
+		responseData := jsonResponse{FileUrl: "File type unsuported"}
+		data, err := json.Marshal(responseData)
+		if err != nil {
+			fmt.Fprintf(w, "{\"Status\":\"%v\"}", err)
+			return
+		}
+		w.WriteHeader(406)
+		w.Write(data)
 	}
+	responseData := jsonResponse{FileUrl: baseUrl + fName, Status: "ok"}
+	data, err := json.Marshal(responseData)
+	if err != nil {
+		fmt.Fprintf(w, "{\"Status\":\"%v\"}", err)
+		return
+	}
+	w.Write(data)
 }
 
-func saveFile(w http.ResponseWriter, file multipart.File, handle *multipart.FileHeader) {
+func saveFile(w http.ResponseWriter, file multipart.File, handle *multipart.FileHeader) (string, error) {
 	data, err := ioutil.ReadAll(file)
 	if err != nil {
 		fmt.Fprintf(w, "%v", err)
-		return
+		return "", err
 	}
-	filename := sanitize.BaseName(handle.Filename)
+	filename := path.Base(handle.Filename)
+	filename = unidecode.Unidecode(filename)
 	err = ioutil.WriteFile("./upload/"+filename, data, 0664)
 	log.Printf("Saving %s\n", filename)
 	if err != nil {
 		fmt.Fprintf(w, "%v", err)
-		return
+		return "", err
 	}
+	return filename, nil
 }
