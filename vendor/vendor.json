@@ -37,6 +37,12 @@
 			"revision": ""
 		},
 		{
+			"checksumSHA1": "pymJIXZlBGQn19bMdHXxgsHDz9k=",
+			"path": "github.com/kennygrant/sanitize",
+			"revision": "2e6820834a1f36c626bf19a253b7d3cc060e9b8b",
+			"revisionTime": "2017-10-05T16:48:50Z"
+		},
+		{
 			"checksumSHA1": "96sUfNvv3aAc6tgF6mcmO+0fBbE=",
 			"path": "github.com/labstack/gommon/log",
 			"revision": "6fe1405d73ec4bd4cd8a4ac8e2a2b2bf95d03954",
@@ -53,6 +59,18 @@
 			"path": "github.com/michaeljs1990/sqlitestore",
 			"revision": "37b8425f7b437b5f20e0a0f50b3fe1a3f069c5bc",
 			"revisionTime": "2017-10-09T14:02:04Z"
+		},
+		{
+			"checksumSHA1": "L68uqaYKEOxkq2xwnNV2bRP7yO4=",
+			"path": "golang.org/x/net/html",
+			"revision": "6078986fec03a1dcc236c34816c71b0e05018fda",
+			"revisionTime": "2017-09-09T04:35:08Z"
+		},
+		{
+			"checksumSHA1": "NvlH++AI8+25Z2Vs8WKxLVCNrxo=",
+			"path": "golang.org/x/net/html/atom",
+			"revision": "6078986fec03a1dcc236c34816c71b0e05018fda",
+			"revisionTime": "2017-09-09T04:35:08Z"
 		}
 	],
 	"rootPath": "github.com/imghost"

@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"mime/multipart"
 	"io/ioutil"
+	"github.com/kennygrant/sanitize"
+	"github.com/labstack/gommon/log"
 )
 
 type User struct {
@@ -83,16 +85,6 @@ func DownloadData(w http.ResponseWriter, r *http.Request) {
 		saveFile(w, file, handle)
 
 	}
-	/*
-	buf, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		log.Printf("Error in uploading file: %v", err)
-	}
-	err = ioutil.WriteFile("upload/1.jpg", buf, 0644)
-	if err != nil {
-		log.Printf("Error in saving file: %v", err)
-	}
-	*/
 }
 
 func saveFile(w http.ResponseWriter, file multipart.File, handle *multipart.FileHeader) {
@@ -101,8 +93,9 @@ func saveFile(w http.ResponseWriter, file multipart.File, handle *multipart.File
 		fmt.Fprintf(w, "%v", err)
 		return
 	}
-
-	err = ioutil.WriteFile("./upload/"+handle.Filename, data, 0666)
+	filename := sanitize.BaseName(handle.Filename)
+	err = ioutil.WriteFile("./upload/"+filename, data, 0664)
+	log.Printf("Saving %s\n", filename)
 	if err != nil {
 		fmt.Fprintf(w, "%v", err)
 		return
