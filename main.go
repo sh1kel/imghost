@@ -55,6 +55,8 @@ func main() {
 	router.Handle("/signin", SignInHandler).Methods("POST")
 	router.Handle("/signup", SignUpHandler).Methods("POST")
 	router.Handle("/logout", LogoutHandler).Methods("GET")
+	router.Handle("/upload", DownloadHandler).Methods("POST")
+
 	router.Handle("/", RootHandler).Methods("GET")
 	router.NotFoundHandler = http.HandlerFunc(NotFoundHandler)
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))

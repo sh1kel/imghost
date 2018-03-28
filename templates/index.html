@@ -1,8 +1,102 @@
 <html>
     <head>
         <title>img hosting</title>
+        <style>
+            .thumb {
+                height: 75px;
+                border: 1px solid #000;
+                margin: 10px 5px 0 0;
+            }
+        </style>
+        <style>
+            #progress_bar {
+                margin: 10px 0;
+                padding: 3px;
+                border: 1px solid #000;
+                font-size: 14px;
+                clear: both;
+                opacity: 0;
+                -moz-transition: opacity 1s linear;
+                -o-transition: opacity 1s linear;
+                -webkit-transition: opacity 1s linear;
+            }
+            #progress_bar.loading {
+                opacity: 1.0;
+            }
+            #progress_bar .percent {
+                background-color: #99ccff;
+                height: auto;
+                width: 0;
+            }
+        </style>
+        <style>
+            #gallery .thumbnail{
+                width:150px;
+                height: 150px;
+                float:left;
+                margin:2px;
+            }
+            #gallery .thumbnail img{
+                width:150px;
+                height: 150px;
+            }
+        </style>
     </head>
     <body>
         Hello, {{.Name}}
-    </body>
+        <br>
+
+        <h2>Upload images ...</h2>
+
+        <input type="file" id="uploadfiles" multiple="multiple" accept="image/*" />
+
+        <div id="gallery"></div>
+        <script>
+            var uploadfiles = document.querySelector('#uploadfiles');
+            uploadfiles.addEventListener('change', function () {
+                var files = this.files;
+                for(var i=0; i<files.length; i++){
+                    previewImage(this.files[i])
+                    uploadFile(this.files[i]); // call the function to upload the file
+                }
+            }, false);
+            function previewImage(file) {
+                var galleryId = "gallery";
+
+                var gallery = document.getElementById(galleryId);
+                var imageType = /image.*/;
+
+                if (!file.type.match(imageType)) {
+                    throw "File Type must be an image";
+                }
+
+                var thumb = document.createElement("div");
+                thumb.classList.add('thumbnail'); // Add the class thumbnail to the created div
+
+                var img = document.createElement("img");
+                img.file = file;
+                thumb.appendChild(img);
+                gallery.appendChild(thumb);
+
+                // Using FileReader to display the image content
+                var reader = new FileReader();
+                reader.onload = (function(aImg) { return function(e) { aImg.src = e.target.result; }; })(img);
+                reader.readAsDataURL(file);
+            }
+            function uploadFile(file){
+                var url = 'http://localhost:8081/upload';
+                var xhr = new XMLHttpRequest();
+                var fd = new FormData();
+                xhr.open("POST", url, true);
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState == 4 && xhr.status == 200) {
+                        // Every thing ok, file uploaded
+                        console.log(xhr.responseText); // handle response.
+                    }
+                };
+                fd.append("uploadfiles", file);
+                xhr.send(fd);
+            }
+        </script>
+        </body>
 </html>

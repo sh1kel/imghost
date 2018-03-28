@@ -3,6 +3,9 @@ package main
 import (
 	"net/http"
 	"html/template"
+	"fmt"
+	"mime/multipart"
+	"io/ioutil"
 )
 
 type User struct {
@@ -17,6 +20,7 @@ var DumbHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) 
 var RootHandler = http.HandlerFunc(RootRoute)
 var AuthHandler = http.HandlerFunc(AuthRoute)
 var NotFoundHandler = http.HandlerFunc(NotFoundRoute)
+var DownloadHandler = http.HandlerFunc(DownloadData)
 
 
 func RootRoute(w http.ResponseWriter, r *http.Request) {
@@ -51,4 +55,56 @@ func AuthRoute(w http.ResponseWriter, r *http.Request) {
 func NotFoundRoute(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotFound)
 	w.Write([]byte("Nothing found..."))
+}
+
+func DownloadData(w http.ResponseWriter, r *http.Request) {
+	session, err := sessionStore.Get(r, "imghost-cookie")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if session.Values["authenticated"] != true {
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte("<html>Unauthorized</html>"))
+		return
+	}
+	file, handle, err := r.FormFile("uploadfiles")
+	if err != nil {
+		fmt.Fprintf(w, "%v", err)
+		return
+	}
+	fmt.Fprintf(w, "File: %s\n", handle.Header)
+	defer file.Close()
+	mimeType := handle.Header.Get("Content-Type")
+	switch mimeType {
+	case "image/jpeg":
+		saveFile(w, file, handle)
+	case "image/png":
+		saveFile(w, file, handle)
+
+	}
+	/*
+	buf, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Printf("Error in uploading file: %v", err)
+	}
+	err = ioutil.WriteFile("upload/1.jpg", buf, 0644)
+	if err != nil {
+		log.Printf("Error in saving file: %v", err)
+	}
+	*/
+}
+
+func saveFile(w http.ResponseWriter, file multipart.File, handle *multipart.FileHeader) {
+	data, err := ioutil.ReadAll(file)
+	if err != nil {
+		fmt.Fprintf(w, "%v", err)
+		return
+	}
+
+	err = ioutil.WriteFile("./upload/"+handle.Filename, data, 0666)
+	if err != nil {
+		fmt.Fprintf(w, "%v", err)
+		return
+	}
 }
