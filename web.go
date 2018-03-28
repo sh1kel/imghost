@@ -68,7 +68,7 @@ func DownloadData(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("<html>Unauthorized</html>"))
 		return
 	}
-	file, handle, err := r.FormFile("uploadfiles")
+	file, handle, err := r.FormFile("file")
 	if err != nil {
 		fmt.Fprintf(w, "%v", err)
 		return

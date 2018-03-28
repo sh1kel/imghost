@@ -2,43 +2,45 @@
     <head>
         <title>img hosting</title>
         <style>
-            .thumb {
-                height: 75px;
-                border: 1px solid #000;
-                margin: 10px 5px 0 0;
+            #drop-area {
+                border: 2px dashed #ccc;
+                border-radius: 20px;
+                width: 480px;
+                font-family: sans-serif;
+                margin: 100px auto;
+                padding: 20px;
             }
-        </style>
-        <style>
-            #progress_bar {
-                margin: 10px 0;
-                padding: 3px;
-                border: 1px solid #000;
-                font-size: 14px;
-                clear: both;
-                opacity: 0;
-                -moz-transition: opacity 1s linear;
-                -o-transition: opacity 1s linear;
-                -webkit-transition: opacity 1s linear;
+            #drop-area.highlight {
+                border-color: purple;
             }
-            #progress_bar.loading {
-                opacity: 1.0;
+            p {
+                margin-top: 0;
             }
-            #progress_bar .percent {
-                background-color: #99ccff;
-                height: auto;
-                width: 0;
+            .my-form {
+                margin-bottom: 10px;
             }
-        </style>
-        <style>
-            #gallery .thumbnail{
-                width:150px;
-                height: 150px;
-                float:left;
-                margin:2px;
+            #gallery {
+                margin-top: 10px;
             }
-            #gallery .thumbnail img{
-                width:150px;
-                height: 150px;
+            #gallery img {
+                width: 150px;
+                margin-bottom: 10px;
+                margin-right: 10px;
+                vertical-align: middle;
+            }
+            .button {
+                display: inline-block;
+                padding: 10px;
+                background: #ccc;
+                cursor: pointer;
+                border-radius: 5px;
+                border: 1px solid #ccc;
+            }
+            .button:hover {
+                background: #ddd;
+            }
+            #fileElem {
+                display: none;
             }
         </style>
     </head>
@@ -46,56 +48,108 @@
         Hello, {{.Name}}
         <br>
 
-        <h2>Upload images ...</h2>
-
-        <input type="file" id="uploadfiles" multiple="multiple" accept="image/*" />
-
-        <div id="gallery"></div>
+        <div id="drop-area">
+            <form class="my-form">
+                <p>Upload multiple files with the file dialog or by dragging and dropping images onto the dashed region</p>
+                <input type="file" id="fileElem" multiple accept="image/*" onchange="handleFiles(this.files)">
+                <label class="button" for="fileElem">Select some files</label>
+            </form>
+            <progress id="progress-bar" max=100 value=0></progress>
+            <div id="gallery" /></div>
+        </div>
         <script>
-            var uploadfiles = document.querySelector('#uploadfiles');
-            uploadfiles.addEventListener('change', function () {
-                var files = this.files;
-                for(var i=0; i<files.length; i++){
-                    previewImage(this.files[i])
-                    uploadFile(this.files[i]); // call the function to upload the file
-                }
-            }, false);
-            function previewImage(file) {
-                var galleryId = "gallery";
+            // ************************ Drag and drop ***************** //
+            dropArea = document.getElementById("drop-area");
 
-                var gallery = document.getElementById(galleryId);
-                var imageType = /image.*/;
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropArea.addEventListener(eventName, preventDefaults, false)
+            document.body.addEventListener(eventName, preventDefaults, false)
+            })
 
-                if (!file.type.match(imageType)) {
-                    throw "File Type must be an image";
-                }
+            // Highlight drop area when item is dragged over it
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropArea.addEventListener(eventName, highlight, false)
+            })
 
-                var thumb = document.createElement("div");
-                thumb.classList.add('thumbnail'); // Add the class thumbnail to the created div
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropArea.addEventListener(eventName, unhighlight, false)
+            })
 
-                var img = document.createElement("img");
-                img.file = file;
-                thumb.appendChild(img);
-                gallery.appendChild(thumb);
+            dropArea.addEventListener('drop', handleDrop, false);
 
-                // Using FileReader to display the image content
-                var reader = new FileReader();
-                reader.onload = (function(aImg) { return function(e) { aImg.src = e.target.result; }; })(img);
-                reader.readAsDataURL(file);
+            function preventDefaults (e) {
+                e.preventDefault();
+                e.stopPropagation();
             }
-            function uploadFile(file){
+
+            function highlight(e) {
+                dropArea.classList.add('highlight');
+            }
+
+            function unhighlight(e) {
+                dropArea.classList.remove('active');
+            }
+
+            function handleDrop(e) {
+                var dt = e.dataTransfer;
+                var files = dt.files;
+                handleFiles(files);
+            }
+
+            uploadProgress = [];
+            progressBar = document.getElementById('progress-bar');
+
+            function initializeProgress(numFiles) {
+                progressBar.value = 0;
+                uploadProgress = [];
+
+                for(i = numFiles; i > 0; i--) {
+                    uploadProgress.push(0);
+                }
+            }
+
+            function updateProgress(fileNumber, percent) {
+                uploadProgress[fileNumber] = percent;
+                let total = uploadProgress.reduce((tot, curr) => tot + curr, 0) / uploadProgress.length;
+                console.debug('update', fileNumber, percent, total);
+                progressBar.value = total;
+            }
+
+            function handleFiles(files) {
+                files = [...files];
+                initializeProgress(files.length);
+                files.forEach(uploadFile);
+                files.forEach(previewFile);
+            }
+
+            function previewFile(file) {
+                reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onloadend = function() {
+                    img = document.createElement('img');
+                    img.src = reader.result;
+                    document.getElementById('gallery').appendChild(img);
+                };
+            }
+
+            function uploadFile(file, i) {
                 var url = 'http://localhost:8081/upload';
                 var xhr = new XMLHttpRequest();
-                var fd = new FormData();
-                xhr.open("POST", url, true);
-                xhr.onreadystatechange = function() {
+                var formData = new FormData();
+                xhr.open('POST', url, true);
+
+                xhr.upload.addEventListener("progress", function(e) {
+                    updateProgress(i, (e.loaded * 100.0 / e.total) || 100)
+                });
+
+                xhr.onreadystatechange = function(e) {
                     if (xhr.readyState == 4 && xhr.status == 200) {
-                        // Every thing ok, file uploaded
-                        console.log(xhr.responseText); // handle response.
+                        updateProgress(i, 100);
                     }
                 };
-                fd.append("uploadfiles", file);
-                xhr.send(fd);
+
+                formData.append('file', file);
+                xhr.send(formData);
             }
         </script>
         </body>
