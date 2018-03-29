@@ -17,7 +17,11 @@ import (
 
 var db *sql.DB
 var sessionStore *sqlitestore.SqliteStore
-const baseUrl = "https://pics.sh1kel.com/files/"
+const (
+	baseUrl = "https://pics.sh1kel.com/files/"
+	uploadDir = "./upload/"
+	thumbsDir = uploadDir + "thumbnail/"
+)
 
 func initDB() {
 	var err error
@@ -56,7 +60,9 @@ func main() {
 	router.Handle("/signin", SignInHandler).Methods("POST")
 	router.Handle("/signup", SignUpHandler).Methods("POST")
 	router.Handle("/logout", LogoutHandler).Methods("GET")
-	router.Handle("/upload", DownloadHandler).Methods("POST")
+	router.Handle("/files", FilesHandler).Methods("GET")
+
+	router.Handle("/upload", UploadHandler).Methods("POST")
 
 	router.Handle("/", RootHandler).Methods("GET")
 	router.NotFoundHandler = http.HandlerFunc(NotFoundHandler)

@@ -10,19 +10,49 @@
         <br>
 
         <script src="/static/dropzone.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+
         <script>
-            Dropzone.options.uploadFilesId = {
+            Dropzone.options.dropzoneId = {
                 paramName: "file",
                 maxFileSie: 10,
                 acceptedFiles: "image/*",
+                init: function () {
+                    dropzoneId = this;
+                    $.get('/files', function (data) {
+                        if (data == null) {
+                            return;
+                        }
+                        data = JSON.parse(data);
+                        for (var i = 0; i < data.length; i++) {
+                            var mockFile = { name: data[i].name, size: data[i].size };
+
+                            dropzoneId.emit("addedfile", mockFile);
+                            dropzoneId.emit("thumbnail", mockFile, '/files/thumbnail/' + data[i].name);
+                            dropzoneId.emit("complete", mockFile);
+                        }
+                    });
+                },
+
                 success: function (file, response) {
-                    obj = JSON.parse(response);
-                    alert(obj.FileUrl);
+                    if (response.status == 406) {
+                        alert("File type not supported")
+                    }
+                    if (data == null) {
+                        return;
+                    }
+                    fileinfo = JSON.parse(response);
+                    var fileuploded = file.previewElement.querySelector("[data-dz-name]");
+                    fileuploded.innerHTML = fileinfo.name;
                 }
+
             }
         </script>
-        <form action="/upload"
-              class="dropzone"
-              id="uploadFilesId"></form>
+        <form action="/upload" class="dropzone" id="dropzone-id">
+            <div class="fallback">
+                <input name="file" type="file" multiple />
+                <input type="submit" value="Upload" />
+            </div>
+        </form>
     </body>
 </html>

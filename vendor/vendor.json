@@ -61,6 +61,12 @@
 			"revisionTime": "2017-10-09T14:02:04Z"
 		},
 		{
+			"checksumSHA1": "6z9MgcvNbdVGsAIvv6BHA1uALQA=",
+			"path": "github.com/nfnt/resize",
+			"revision": "83c6a9932646f83e3267f353373d47347b6036b2",
+			"revisionTime": "2018-02-21T19:10:11Z"
+		},
+		{
 			"checksumSHA1": "pvg8L4xN+zO9HLJislpVeHPPLjM=",
 			"path": "github.com/rainycape/unidecode",
 			"revision": "cb7f23ec59bec0d61b19c56cd88cee3d0cc1870c",

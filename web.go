@@ -4,12 +4,8 @@ import (
 	"net/http"
 	"html/template"
 	"fmt"
-	"mime/multipart"
-	"io/ioutil"
-	"github.com/labstack/gommon/log"
 	"encoding/json"
-	"github.com/rainycape/unidecode"
-	"path"
+	"log"
 )
 
 type User struct {
@@ -24,8 +20,8 @@ var DumbHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) 
 var RootHandler = http.HandlerFunc(RootRoute)
 var AuthHandler = http.HandlerFunc(AuthRoute)
 var NotFoundHandler = http.HandlerFunc(NotFoundRoute)
-var DownloadHandler = http.HandlerFunc(DownloadData)
-
+var UploadHandler = http.HandlerFunc(UploadData)
+var FilesHandler = http.HandlerFunc(FilesRoute)
 
 func RootRoute(w http.ResponseWriter, r *http.Request) {
 	var user = User{Name: "Anonym"}
@@ -48,7 +44,6 @@ func RootRoute(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-
 }
 
 func AuthRoute(w http.ResponseWriter, r *http.Request) {
@@ -61,11 +56,11 @@ func NotFoundRoute(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Nothing found..."))
 }
 
-func DownloadData(w http.ResponseWriter, r *http.Request) {
+func UploadData(w http.ResponseWriter, r *http.Request) {
 	var fName string
 	type jsonResponse struct {
-		FileUrl	string	`json:"FileUrl"`
-		Status	string	`json:"Status"`
+		Name	string	`json:"name"`
+		Size	int		`json:"size"`
 	}
 	session, err := sessionStore.Get(r, "imghost-cookie")
 	if err != nil {
@@ -86,41 +81,31 @@ func DownloadData(w http.ResponseWriter, r *http.Request) {
 	mimeType := handle.Header.Get("Content-Type")
 	switch mimeType {
 	case "image/jpeg":
-		fName, err = saveFile(w, file, handle)
+		fName, err = saveFile(file, handle)
 	case "image/png":
-		fName, err = saveFile(w, file, handle)
+		fName, err = saveFile(file, handle)
 	default:
-		responseData := jsonResponse{FileUrl: "File type unsuported"}
-		data, err := json.Marshal(responseData)
 		if err != nil {
-			fmt.Fprintf(w, "{\"Status\":\"%v\"}", err)
-			return
+			log.Println(err)
 		}
 		w.WriteHeader(406)
-		w.Write(data)
+		return
 	}
-	responseData := jsonResponse{FileUrl: baseUrl + fName, Status: "ok"}
+	responseData := jsonResponse{Name: baseUrl + fName, Size: 1000}
 	data, err := json.Marshal(responseData)
 	if err != nil {
-		fmt.Fprintf(w, "{\"Status\":\"%v\"}", err)
+		log.Println(err)
 		return
 	}
 	w.Write(data)
 }
 
-func saveFile(w http.ResponseWriter, file multipart.File, handle *multipart.FileHeader) (string, error) {
-	data, err := ioutil.ReadAll(file)
+func FilesRoute(w http.ResponseWriter, r *http.Request) {
+	files := scanUploads(uploadDir + ".")
+	response, err := json.Marshal(files.items)
 	if err != nil {
-		fmt.Fprintf(w, "%v", err)
-		return "", err
+		fmt.Println(err)
 	}
-	filename := path.Base(handle.Filename)
-	filename = unidecode.Unidecode(filename)
-	err = ioutil.WriteFile("./upload/"+filename, data, 0664)
-	log.Printf("Saving %s\n", filename)
-	if err != nil {
-		fmt.Fprintf(w, "%v", err)
-		return "", err
-	}
-	return filename, nil
+	w.Write(response)
 }
+

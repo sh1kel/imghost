@@ -14,7 +14,7 @@
 .glide/
 /vendor/*
 !/vendor/vendor.json
-
+/upload/*
 # Database
 auth.sqlite*
 imghost
