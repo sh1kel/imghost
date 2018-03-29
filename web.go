@@ -58,9 +58,10 @@ func NotFoundRoute(w http.ResponseWriter, r *http.Request) {
 
 func UploadData(w http.ResponseWriter, r *http.Request) {
 	var fName string
+	var fSize int64
 	type jsonResponse struct {
 		Name	string	`json:"name"`
-		Size	int		`json:"size"`
+		Size	int64	`json:"size"`
 	}
 	session, err := sessionStore.Get(r, "imghost-cookie")
 	if err != nil {
@@ -81,9 +82,9 @@ func UploadData(w http.ResponseWriter, r *http.Request) {
 	mimeType := handle.Header.Get("Content-Type")
 	switch mimeType {
 	case "image/jpeg":
-		fName, err = saveFile(file, handle)
+		fName, fSize, err = saveFile(file, handle, "jpg")
 	case "image/png":
-		fName, err = saveFile(file, handle)
+		fName, fSize, err = saveFile(file, handle, "png")
 	default:
 		if err != nil {
 			log.Println(err)
@@ -91,7 +92,7 @@ func UploadData(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(406)
 		return
 	}
-	responseData := jsonResponse{Name: baseUrl + fName, Size: 1000}
+	responseData := jsonResponse{Name: baseUrl + fName, Size: fSize}
 	data, err := json.Marshal(responseData)
 	if err != nil {
 		log.Println(err)

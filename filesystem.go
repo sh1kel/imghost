@@ -3,15 +3,19 @@ package main
 import (
 	"mime/multipart"
 	"fmt"
-	"path"
+	//"path"
 	"io/ioutil"
-	"github.com/rainycape/unidecode"
+	//"github.com/rainycape/unidecode"
 	"strings"
 	"image/jpeg"
 	"image/png"
 	"os"
 	"path/filepath"
 	"github.com/nfnt/resize"
+	"io"
+	"bytes"
+	"crypto/md5"
+	"encoding/hex"
 )
 
 type uploadedFile struct {
@@ -24,21 +28,32 @@ type uploadedFiles struct {
 	items []uploadedFile
 }
 
-func saveFile(file multipart.File, handle *multipart.FileHeader) (string, error) {
+func saveFile(file multipart.File, handle *multipart.FileHeader, extenstion string) (string, int64, error) {
 	data, err := ioutil.ReadAll(file)
 	if err != nil {
 		fmt.Printf("%v", err)
-		return "", err
+		return "", 0, err
 	}
-	filename := path.Base(handle.Filename)
-	filename = unidecode.Unidecode(filename)
+	hash := md5.New()
+	_, err = io.Copy(hash, bytes.NewReader(data))
+	if err != nil {
+		return "", 0, err
+	}
+	//filename := path.Base(handle.Filename)
+	//filename = unidecode.Unidecode(filename)
+	filename := hex.EncodeToString(hash.Sum(nil)) + "." + extenstion
 	err = ioutil.WriteFile(uploadDir + filename, data, 0664)
 	if err != nil {
 		fmt.Printf("%v", err)
-		return "", err
+		return "", 0, err
+	}
+	fSize, err := os.Stat(uploadDir + filename)
+	if err != nil {
+		fmt.Printf("%v", err)
+		return "", 0, err
 	}
 	go createThumbnail(filename)
-	return filename, nil
+	return filename, fSize.Size(), nil
 }
 
 func scanUploads(dir string) *uploadedFiles {

@@ -36,9 +36,7 @@
 
                 success: function (file, response) {
                     if (response.status == 406) {
-                        alert("File type not supported")
-                    }
-                    if (data == null) {
+                        alert("File type not supported");
                         return;
                     }
                     fileinfo = JSON.parse(response);
