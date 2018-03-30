@@ -15,8 +15,23 @@
   <link href="/static/css/visage.css" type="text/css" rel="stylesheet" />
 </head>
 
-<body >
-  <div id="logo"><h1>img hosting</h1></div>
+<body>
+  <div id="main-header"><h1>img hosting</h1></div>
+  <script>
+      function httpGet(theUrl)
+      {
+          var xmlHttp = new XMLHttpRequest();
+          xmlHttp.open( "GET", theUrl, false ); // false for synchronous request
+          xmlHttp.send( null );
+          return xmlHttp.responseText;
+      }
+      var Header = document.getElementById('main-header')
+      if (Header.outerHTML) {
+          user = httpGet("http://localhost:8081");
+          user = JSON.parse(user)
+          Header.outerHTML = "<h1>Hello, " + user.name + "<h1>";
+      }
+  </script>
   <div id="basic-accordian" >
     <div id="test-header" class="accordion_headings header_highlight">Images</div>
     <div id="test-content">

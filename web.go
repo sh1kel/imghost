@@ -11,7 +11,7 @@ import (
 )
 
 type User struct {
-	Name	string
+	Name	string	`json:"name"`
 }
 
 var DumbHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
