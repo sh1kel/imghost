@@ -91,6 +91,8 @@ func UploadData(w http.ResponseWriter, r *http.Request) {
 		fName, fSize, err = saveFile(file, handle, "jpg", hashedUserName)
 	case "image/png":
 		fName, fSize, err = saveFile(file, handle, "png", hashedUserName)
+	case "image/gif":
+		fName, fSize, err = saveFile(file, handle, "gif", hashedUserName)
 	default:
 		if err != nil {
 			log.Println(err)

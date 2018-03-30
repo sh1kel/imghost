@@ -16,6 +16,7 @@ import (
 	"bytes"
 	"crypto/md5"
 	"encoding/hex"
+	"image/gif"
 )
 
 type uploadedFile struct {
@@ -137,5 +138,13 @@ func createThumbnail(fileName string, userName string) {
 
 		resized := resize.Thumbnail(180, 180, img, resize.Lanczos3)
 		png.Encode(out, resized)
+	} else if strings.HasSuffix(name, ".gif") {
+		img, err := gif.Decode(file)
+		if err != nil {
+			return
+		}
+		gitOpts := gif.Options{256, nil, nil}
+		resized := resize.Thumbnail(180, 180, img, resize.Lanczos3)
+		gif.Encode(out, resized, &gitOpts)
 	}
 }
