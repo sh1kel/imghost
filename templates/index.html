@@ -28,7 +28,7 @@
                             var mockFile = { name: data[i].name, size: data[i].size };
 
                             dropzoneId.emit("addedfile", mockFile);
-                            dropzoneId.emit("thumbnail", mockFile, '/files/thumbnail/' + data[i].name);
+                            dropzoneId.emit("thumbnail", mockFile, '/files/' + data[i].user + "/thumbnail/" + data[i].name);
                             dropzoneId.emit("complete", mockFile);
                         }
                     });

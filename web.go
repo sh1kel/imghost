@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"encoding/json"
 	"log"
+	"crypto/md5"
+	"encoding/hex"
 )
 
 type User struct {
@@ -73,6 +75,10 @@ func UploadData(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("<html>Unauthorized</html>"))
 		return
 	}
+	userName := session.Values["username"].(string)
+	userNameHash := md5.New()
+	userNameHash.Write([]byte(userName))
+	hashedUserName := hex.EncodeToString(userNameHash.Sum(nil))
 	file, handle, err := r.FormFile("file")
 	if err != nil {
 		fmt.Fprintf(w, "{\"Error\":\"%v\"}", err)
@@ -82,9 +88,9 @@ func UploadData(w http.ResponseWriter, r *http.Request) {
 	mimeType := handle.Header.Get("Content-Type")
 	switch mimeType {
 	case "image/jpeg":
-		fName, fSize, err = saveFile(file, handle, "jpg")
+		fName, fSize, err = saveFile(file, handle, "jpg", hashedUserName)
 	case "image/png":
-		fName, fSize, err = saveFile(file, handle, "png")
+		fName, fSize, err = saveFile(file, handle, "png", hashedUserName)
 	default:
 		if err != nil {
 			log.Println(err)
@@ -92,7 +98,7 @@ func UploadData(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(406)
 		return
 	}
-	responseData := jsonResponse{Name: baseUrl + fName, Size: fSize}
+	responseData := jsonResponse{Name: baseUrl + hashedUserName + "/" + fName, Size: fSize}
 	data, err := json.Marshal(responseData)
 	if err != nil {
 		log.Println(err)
@@ -102,7 +108,21 @@ func UploadData(w http.ResponseWriter, r *http.Request) {
 }
 
 func FilesRoute(w http.ResponseWriter, r *http.Request) {
-	files := scanUploads(uploadDir + ".")
+	session, err := sessionStore.Get(r, "imghost-cookie")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if session.Values["authenticated"] != true {
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Write([]byte("<html>Unauthorized</html>"))
+		return
+	}
+	userName := session.Values["username"].(string)
+	userNameHash := md5.New()
+	userNameHash.Write([]byte(userName))
+	userName = hex.EncodeToString(userNameHash.Sum(nil))
+	files := scanUploads(uploadDir, userName)
 	response, err := json.Marshal(files.items)
 	if err != nil {
 		fmt.Println(err)

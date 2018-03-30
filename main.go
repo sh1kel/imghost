@@ -20,7 +20,6 @@ var sessionStore *sqlitestore.SqliteStore
 const (
 	baseUrl = "https://pics.sh1kel.com/files/"
 	uploadDir = "./upload/"
-	thumbsDir = uploadDir + "thumbnail/"
 )
 
 func initDB() {
