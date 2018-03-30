@@ -1,0 +1,37 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>img hosting</title>
+  <link rel="stylesheet" href="/static/css/style.css" type="text/css" media="screen" />
+  <script type="text/javascript" src="/static/accordian.pack.js"></script>
+  <script src="/static/dropzone.js"></script>
+  <script src="/static/jquery-3.3.1.min.js"></script>
+  <script src="/static/jquery.visage.js"></script>
+  <script src="/static/content.js"></script>
+
+  <link href="/static/css/dropzone.css" type="text/css" rel="stylesheet" />
+  <link href="/static/css/visage.css" type="text/css" rel="stylesheet" />
+</head>
+
+<body >
+  <div id="logo"><h1>img hosting</h1></div>
+  <div id="basic-accordian" >
+    <div id="test-header" class="accordion_headings header_highlight">Images</div>
+    <div id="test-content">
+      <div class="accordion_child">
+          <form action="/upload" class="dropzone" id="dropzone-id">
+              <div class="fallback">
+                  <input name="file" type="file" multiple />
+                  <input type="submit" value="Upload" />
+              </div>
+          </form>
+          <div id="images-alt"></div>
+      </div>
+
+    </div>
+  <div id="footer">
+  </div>
+</body>
+</html>

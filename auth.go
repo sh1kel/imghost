@@ -22,13 +22,11 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 	creds := &Credentials{}
 	err := json.NewDecoder(r.Body).Decode(creds)
 	if err != nil {
-		w.Write([]byte(err.Error()))
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 	result := db.QueryRow("select password from auth where username=$1", creds.Username)
 	if err != nil {
-		w.Write([]byte(err.Error()))
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -37,7 +35,6 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if err == sql.ErrNoRows {
 			w.WriteHeader(http.StatusUnauthorized)
-			w.Write([]byte("<html></html>"))
 			return
 		}
 		w.WriteHeader(http.StatusInternalServerError)
@@ -47,13 +44,12 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 	err = bcrypt.CompareHashAndPassword([]byte(storedCreds.Password), []byte(creds.Password))
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
-		w.Write([]byte("<html></html>"))
 		return
 	}
 
 	session, err := sessionStore.Get(r, "imghost-cookie")
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
@@ -63,10 +59,9 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 
 	err = session.Save(r, w)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	w.Write([]byte("<html></html>"))
 }
 
 func SignUp(w http.ResponseWriter, r *http.Request) {
@@ -74,7 +69,6 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 	creds := &Credentials{}
 	err := json.NewDecoder(r.Body).Decode(creds)
 	if err != nil {
-		w.Write([]byte(err.Error()))
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -85,21 +79,18 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if session.Values["authenticated"] != true {
-		w.Write([]byte("Forbidden"))
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(creds.Password), 8)
 	if err != nil {
-		w.Write([]byte(err.Error()))
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	_, err = db.Exec("insert into auth (username, password) values ($1, $2)", creds.Username, string(hashedPassword))
 	if err != nil {
-		w.Write([]byte(err.Error()))
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -114,18 +105,15 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if session.Values["authenticated"] != true {
-		w.Write([]byte("Forbidden"))
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
 	session.Values["authenticated"] = false
 	session.Save(r, w)
 	if err != nil {
-		w.Write([]byte(err.Error()))
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	//w.Write([]byte("Logged out"))
 	http.Redirect(w, r, "http://localhost:8081", 307)
 
 }

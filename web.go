@@ -12,7 +12,6 @@ import (
 
 type User struct {
 	Name	string
-
 }
 
 var DumbHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -29,23 +28,22 @@ func RootRoute(w http.ResponseWriter, r *http.Request) {
 	var user = User{Name: "Anonym"}
 	session, err := sessionStore.Get(r, "imghost-cookie")
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 	if session.Values["authenticated"] != true {
 		http.Redirect(w, r, "http://localhost:8081/auth", 307)
+		return
 	}
 	if session.Values["username"] != nil {
 		user.Name = session.Values["username"].(string)
 	}
-	indexTemplate, err := template.ParseFiles("templates/index.html")
-
-	err = indexTemplate.Execute(w, user)
+	response, err := json.Marshal(user)
 	if err != nil {
-		w.Write([]byte(err.Error()))
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
+	w.Write(response)
 }
 
 func AuthRoute(w http.ResponseWriter, r *http.Request) {
@@ -81,7 +79,6 @@ func UploadData(w http.ResponseWriter, r *http.Request) {
 	hashedUserName := hex.EncodeToString(userNameHash.Sum(nil))
 	file, handle, err := r.FormFile("file")
 	if err != nil {
-		fmt.Fprintf(w, "{\"Error\":\"%v\"}", err)
 		return
 	}
 	defer file.Close()
@@ -94,9 +91,6 @@ func UploadData(w http.ResponseWriter, r *http.Request) {
 	case "image/gif":
 		fName, fSize, err = saveFile(file, handle, "gif", hashedUserName)
 	default:
-		if err != nil {
-			log.Println(err)
-		}
 		w.WriteHeader(406)
 		return
 	}
@@ -117,7 +111,6 @@ func FilesRoute(w http.ResponseWriter, r *http.Request) {
 	}
 	if session.Values["authenticated"] != true {
 		w.WriteHeader(http.StatusUnauthorized)
-		w.Write([]byte("<html>Unauthorized</html>"))
 		return
 	}
 	userName := session.Values["username"].(string)

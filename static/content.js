@@ -1,17 +1,3 @@
-<html>
-    <head>
-        <title>img hosting</title>
-        <link href="/static/css/basic.css" type="text/css" rel="stylesheet" />
-        <link href="/static/css/dropzone.css" type="text/css" rel="stylesheet" />
-        <link href="/static/css/visage.css" type="text/css" rel="stylesheet" />
-
-        <script src="/static/dropzone.js"></script>
-        <script src="/static/jquery-3.3.1.min.js"></script>
-        <script src="/static/jquery.visage.js"></script>
-        <style>
-
-        </style>
-        <script type="text/javascript">
             $.fn.loadImages = function (callback) {
                 var element = this;
                 $.getJSON("http://localhost:8081/files", function (data, textStatus) {
@@ -82,12 +68,6 @@
                     });
                 }, 2000);
             });
-        </script>
-    </head>
-    <body>
-        Hello, {{.Name}}
-        <br>
-        <script>
             Dropzone.options.dropzoneId = {
                 paramName: "file",
                 maxFileSie: 10,
@@ -104,13 +84,3 @@
                 }
 
             }
-        </script>
-        <form action="/upload" class="dropzone" id="dropzone-id">
-            <div class="fallback">
-                <input name="file" type="file" multiple />
-                <input type="submit" value="Upload" />
-            </div>
-        </form>
-        <div id="images-alt"></div>
-    </body>
-</html>
