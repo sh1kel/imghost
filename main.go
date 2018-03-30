@@ -61,11 +61,12 @@ func main() {
 	router.Handle("/logout", LogoutHandler).Methods("GET")
 	router.Handle("/files", FilesHandler).Methods("GET")
 	router.Handle("/upload", UploadHandler).Methods("POST")
-	router.Handle("/", RootHandler).Methods("GET")
+	router.Handle("/user", RootHandler).Methods("GET")
 	router.NotFoundHandler = http.HandlerFunc(NotFoundHandler)
-
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
 	router.PathPrefix("/files/").Handler(http.StripPrefix("/files/", http.FileServer(http.Dir("./upload/"))))
+	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./static/")))
+
 
 
 

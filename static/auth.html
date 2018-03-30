@@ -3,11 +3,11 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 	<title>img hosging</title>
-	<link rel="stylesheet" href="static/css/reset.css">
-	<link rel="stylesheet" href="static/css/animate.css">
-	<link rel="stylesheet" href="static/css/styles.css">
+	<link rel="stylesheet" href="/static/css/reset.css">
+	<link rel="stylesheet" href="/static/css/animate.css">
+	<link rel="stylesheet" href="/static/css/styles.css">
 	<link rel="icon" href="favicon.ico" type="image/x-icon">
-	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+	<link rel="shortcut icon" href="/static/favicon.ico" type="image/x-icon">
 </head>
 <body>
 
@@ -36,7 +36,7 @@
 			http.open('POST', '/signin', false)
 			http.setRequestHeader('Content-type', 'application/json')
 			http.send(JSON.stringify(params))
-            window.location.replace("http://localhost:8081")
+            window.location.replace("http://localhost:8081/index.html")
 		}
     </script>
 </body>

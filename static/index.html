@@ -8,11 +8,11 @@
   <link href="/static/css/dropzone.css" type="text/css" rel="stylesheet" />
   <link href="/static/css/visage.css" type="text/css" rel="stylesheet" />
 
-  <script type="text/javascript" src="/static/accordian.pack.js"></script>
-  <script src="/static/dropzone.js"></script>
+  <script type="text/javascript" src="/static/js/accordian.pack.js"></script>
+  <script src="/static/js/dropzone.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-  <script src="/static/jquery.visage.js"></script>
-  <script src="/static/content.js"></script>
+  <script src="/static/js/jquery.visage.js"></script>
+  <script src="/static/js/content.js"></script>
 
 </head>
 
@@ -28,7 +28,7 @@
       }
       var Header = document.getElementById('main-header')
       if (Header.outerHTML) {
-          user = httpGet("http://localhost:8081");
+          user = httpGet("http://localhost:8081/user");
           user = JSON.parse(user)
           Header.outerHTML = "<h1>Hello, " + user.name + "<h1>";
       }

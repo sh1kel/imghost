@@ -2,7 +2,6 @@ package main
 
 import (
 	"net/http"
-	"html/template"
 	"fmt"
 	"encoding/json"
 	"log"
@@ -47,8 +46,9 @@ func RootRoute(w http.ResponseWriter, r *http.Request) {
 }
 
 func AuthRoute(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(template.ParseFiles("templates/auth.html"))
-	tmpl.Execute(w, nil)
+	//tmpl := template.Must(template.ParseFiles("templates/auth.html"))
+	//tmpl.Execute(w, nil)
+	http.Redirect(w, r, "http://localhost:8081/static/html/auth.html", 307)
 }
 
 func NotFoundRoute(w http.ResponseWriter, r *http.Request) {
